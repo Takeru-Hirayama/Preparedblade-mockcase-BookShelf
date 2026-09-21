@@ -58,37 +58,21 @@ Docker Compose
 
 ## 環境構築手順
 
-1.  Laravelプロジェクトの作成 (Laravel 10.x)
+1.  リポジトリをクローン
 
 ```
 
-以下のDockerコマンドを実行して、Laravel 10.xを明示的に指定してプロジェクトを作成します。
-
-docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest composer create-project laravel/laravel:^10.0 bookshelf-app
+git clone git@github.com:Takeru-Hirayama/Preparedblade-mockcase-BookShelf.git
 
 ```
 
-2.  Laravel Sailのインストール
+2.  .env ファイルの準備
 
 ```
 
-プロジェクト作成後、bookshelf-app ディレクトリに移動し、Laravel Sailをインストールします。
-
-# プロジェクトディレクトリに移動
-
-cd bookshelf-app
-
-# Laravel Sailをインストール
-
-docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest composer require laravel/sail --dev
-
-# Sailの設定ファイルをパブリッシュ（MySQLを選択）
-
-docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest php artisan sail:install --with=mysql
+cp .env.example .env
 
 ```
-
-3.  .env ファイルの設定
 
 ```
 
@@ -105,77 +89,15 @@ DB_PASSWORD=password
 
 ```
 
-4. フロントエンドのセットアップ (Vite & Tailwind CSS)
+3.  パッケージのインストール
 
 ```
 
-本プロジェクトでは、フロントエンドのスタイリングにTailwind CSSを使用します。
-以下の手順でセットアップを行ってください。
-
-1. NPM依存パッケージのインストール
-   sail npm install
-   ※Sailコンテナが起動していることを確認。起動していない場合は ./vendor/bin/sail up -d を実行
-
-2. Alpine.jsのインストール
-   sail npm install alpinejs
-
-3. Tailwind CSSと @tailwindcss/forms プラグインのインストール
-   sail npm install -D tailwindcss@^3.4.0 @tailwindcss/forms postcss autoprefixer
-   ※ @tailwindcss/forms はフォーム要素のスタイルをリセットするLaravel標準プラグインです。
-
-4. 設定ファイルの生成
-   sail npx tailwindcss init -p
-
-5. Tailwind CSSのテンプレートパス設定とforms プラグインの有効化
-   tailwind.config.js を以下の内容で上書きしてください：
-
-import defaultTheme from 'tailwindcss/defaultTheme';
-import forms from '@tailwindcss/forms';
-
-/** @type {import('tailwindcss').Config} _/
-export default {
-content: [
-'./vendor/laravel/framework/src/Illuminate/Pagination/resources/views/_.blade.php',
-'./storage/framework/views/\*.php',
-'./resources/views/**/\*.blade.php',
-],
-theme: {
-extend: {
-fontFamily: {
-sans: ['Figtree', ...defaultTheme.fontFamily.sans],
-},
-},
-},
-plugins: [forms],
-};
-
-6. 本プロジェクトのresourcesファイルを coachtech-prepared-file/Preparedblade-mockcase-BookShelf リポジトリの Basicブランチ のresourcesファイルと入れ替え
-
-7. Vite開発サーバーの起動
-   sail npm run dev
-   注意: 開発中は常にこのコマンドを実行した状態にしておいてください。
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest composer require laravel/sail --dev
 
 ```
 
-5. phpMyAdminの追加
-
-```
-
-compose.yaml を開き、mysql サービスの後に以下の設定を追加してください。
-
-phpmyadmin:
-image: 'phpmyadmin:latest'
-ports: - '${FORWARD_PHPMYADMIN_PORT:-8080}:80'
-    environment:
-        PMA_HOST: mysql
-        PMA_USER: '${DB_USERNAME}'
-PMA_PASSWORD: '${DB_PASSWORD}'
-networks: - sail
-depends_on: - mysql
-
-```
-
-6. Sailの起動とエイリアス設定
+4. Sailの起動とエイリアス設定
 
 ```
 
@@ -193,7 +115,7 @@ exec $SHELL
 
 ```
 
-7. アプリケーションキーの生成
+5. アプリケーションキーの生成
 
 ```
 
@@ -202,7 +124,7 @@ sail artisan key:generate
 
 ```
 
-8. データベースのマイグレーションと初期データ投入
+6. データベースのマイグレーションと初期データ投入
 
 ```
 
@@ -211,6 +133,16 @@ sail artisan migrate --seed
 
 ※既存のデータベースをリセットしたい場合は以下を実行してください。
 sail artisan migrate:fresh --seed
+
+```
+
+7. フロントエンドのビルド
+
+```
+
+sail npm install
+sail npm install alpinejs
+sail npm run dev
 
 ```
 
