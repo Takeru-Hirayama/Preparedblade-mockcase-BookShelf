@@ -93,7 +93,7 @@ DB_PASSWORD=password
 
 ```
 
-docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest composer require laravel/sail --dev
+docker run --rm -u "$(id -u):$(id -g)" -v "$(pwd):/var/www/html" -w /var/www/html -e COMPOSER_CACHE_DIR=/tmp/composer_cache laravelsail/php82-composer:latest composer install
 
 ```
 
@@ -141,7 +141,6 @@ sail artisan migrate:fresh --seed
 ```
 
 sail npm install
-sail npm install alpinejs
 sail npm run dev
 
 ```
